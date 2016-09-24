@@ -60,6 +60,11 @@ impl Vga {
                 self.buffer[prev_position] = self.buffer[current_position];
             }
         }
+         
+        for c in 0..COLS {
+            self.buffer[(ROWS - 1) * COLS * 2 + c] = ' ' as u8;
+        }
+
         self.position = (ROWS - 1) * COLS * 2;
     }
 }
@@ -186,5 +191,9 @@ mod tests {
         }
 
         assert_eq!(vga.buffer[0], 'c' as u8);
+        for c in 0..COLS {
+            assert_eq!(vga.buffer[(ROWS - 1) * COLS * 2 + c], ' ' as u8);
+        }
     }
+
 }
