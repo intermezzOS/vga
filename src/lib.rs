@@ -34,10 +34,16 @@ impl Vga {
     fn write_byte(&mut self, byte: u8) {
         let i = self.position;
 
-        self.buffer[i] = byte;
-        self.buffer[i + 1] = color::colorcode(Color::Green, Color::Black);
+        if byte == '\n' as u8 {
+            let current_line = self.position / 50;
 
-        self.position += 2;
+            self.position = (current_line + 1) * 25 * 2;
+        } else {
+            self.buffer[i] = byte;
+            self.buffer[i + 1] = color::colorcode(Color::Green, Color::Black);
+
+            self.position += 2;
+        }
     }
 }
 
@@ -116,5 +122,36 @@ mod tests {
         assert_eq!(vga.buffer[19], 0x02);
         assert_eq!(vga.buffer[20], 'd' as u8);
         assert_eq!(vga.buffer[21], 0x02);
+    }
+
+    #[test]
+    fn write_newline() {
+        let mut mock_memory = [0u8; 25 * 80];
+        let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
+
+        vga.write_str("hello\nworld\n!").unwrap();
+
+        assert_eq!(vga.buffer[0], 'h' as u8);
+        assert_eq!(vga.buffer[1], 0x02);
+        assert_eq!(vga.buffer[2], 'e' as u8);
+        assert_eq!(vga.buffer[3], 0x02);
+        assert_eq!(vga.buffer[4], 'l' as u8);
+        assert_eq!(vga.buffer[5], 0x02);
+        assert_eq!(vga.buffer[6], 'l' as u8);
+        assert_eq!(vga.buffer[7], 0x02);
+        assert_eq!(vga.buffer[8], 'o' as u8);
+        assert_eq!(vga.buffer[9], 0x02);
+        assert_eq!(vga.buffer[50], 'w' as u8);
+        assert_eq!(vga.buffer[51], 0x02);
+        assert_eq!(vga.buffer[52], 'o' as u8);
+        assert_eq!(vga.buffer[53], 0x02);
+        assert_eq!(vga.buffer[54], 'r' as u8);
+        assert_eq!(vga.buffer[55], 0x02);
+        assert_eq!(vga.buffer[56], 'l' as u8);
+        assert_eq!(vga.buffer[57], 0x02);
+        assert_eq!(vga.buffer[58], 'd' as u8);
+        assert_eq!(vga.buffer[59], 0x02);
+        assert_eq!(vga.buffer[100], '!' as u8);
+        assert_eq!(vga.buffer[101], 0x02);
     }
 }
