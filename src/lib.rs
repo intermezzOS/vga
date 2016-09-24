@@ -15,6 +15,16 @@ impl Vga {
             buffer: [0; 25 * 80],
         }
     }
+
+    pub fn flush(&self) {
+        unsafe {
+            let location = self.location;
+            let length = self.buffer.len();
+            let buffer = self.buffer.as_ptr();
+
+            core::ptr::copy_nonoverlapping(buffer, location, length);
+        }
+    }
 }
 
 impl Write for Vga {
