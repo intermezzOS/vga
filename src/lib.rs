@@ -19,7 +19,9 @@ impl Vga {
 
 impl Write for Vga {
     fn write_str(&mut self, s: &str) -> Result<(), fmt::Error> {
-        self.buffer[0] = s.bytes().next().unwrap();
+        for (i, b)  in s.bytes().enumerate() {
+            self.buffer[i] = b;
+        }
         Ok(())
     }
 }
@@ -38,5 +40,19 @@ mod tests {
         vga.write_str("a").unwrap();
 
         assert_eq!(vga.buffer[0], 'a' as u8);
+    }
+
+    #[test]
+    fn write_a_word() {
+        let mut mock_memory = [0u8; 25 * 80];
+        let mut vga = unsafe { Vga::new(&mut mock_memory[0] as *mut u8) };
+
+        let word = "word";
+        vga.write_str(word).unwrap();
+      
+        assert_eq!(vga.buffer[0], 'w' as u8);
+        assert_eq!(vga.buffer[1], 'o' as u8);
+        assert_eq!(vga.buffer[2], 'r' as u8);
+        assert_eq!(vga.buffer[3], 'd' as u8);
     }
 }
