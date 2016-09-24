@@ -5,14 +5,14 @@ use core::fmt::Write;
 
 pub struct Vga {
     location: *mut u8,
-    buffer: [u8; 25 * 80],
+    buffer: [u8; 25 * 80 * 2],
 }
 
 impl Vga {
     pub unsafe fn new(location: *mut u8) -> Vga {
         Vga {
             location: location,
-            buffer: [0; 25 * 80],
+            buffer: [0; 25 * 80 * 2],
         }
     }
 
@@ -29,8 +29,10 @@ impl Vga {
 
 impl Write for Vga {
     fn write_str(&mut self, s: &str) -> Result<(), fmt::Error> {
-        for (i, b)  in s.bytes().enumerate() {
+        for (i, b) in s.bytes().enumerate() {
+            let i = i * 2;
             self.buffer[i] = b;
+            self.buffer[i + 1] = 0x02;
         }
         Ok(())
     }
@@ -50,6 +52,7 @@ mod tests {
         vga.write_str("a").unwrap();
 
         assert_eq!(vga.buffer[0], 'a' as u8);
+        assert_eq!(vga.buffer[1],  0x02);
     }
 
     #[test]
@@ -61,8 +64,12 @@ mod tests {
         vga.write_str(word).unwrap();
       
         assert_eq!(vga.buffer[0], 'w' as u8);
-        assert_eq!(vga.buffer[1], 'o' as u8);
-        assert_eq!(vga.buffer[2], 'r' as u8);
-        assert_eq!(vga.buffer[3], 'd' as u8);
+        assert_eq!(vga.buffer[1], 0x02);
+        assert_eq!(vga.buffer[2], 'o' as u8);
+        assert_eq!(vga.buffer[3], 0x02);
+        assert_eq!(vga.buffer[4], 'r' as u8);
+        assert_eq!(vga.buffer[5], 0x02);
+        assert_eq!(vga.buffer[6], 'd' as u8);
+        assert_eq!(vga.buffer[7], 0x02);
     }
 }
