@@ -46,7 +46,7 @@ impl Vga {
 
             self.position += 2;
         }
-       
+
         if self.position >= self.buffer.len() {
             self.scroll();
         }
