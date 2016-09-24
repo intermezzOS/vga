@@ -4,7 +4,7 @@ pub enum Color {
     Blue = 0x1,
     Green = 0x2,
     Cyan = 0x3,
-    Red = 0x4, 
+    Red = 0x4,
     Magenta = 0x5,
     Brown = 0x6,
     Gray = 0x7,
@@ -29,9 +29,9 @@ mod tests {
 
     #[test]
     fn colorcode() {
-      assert_eq!(color::colorcode(Color::Blue, Color::BrightMagenta), 0xD1);
-      assert_eq!(color::colorcode(Color::Yellow, Color::Red), 0x4E);
-      assert_eq!(color::colorcode(Color::DarkGray, Color::White), 0xF8);
+        assert_eq!(color::colorcode(Color::Blue, Color::BrightMagenta), 0xD1);
+        assert_eq!(color::colorcode(Color::Yellow, Color::Red), 0x4E);
+        assert_eq!(color::colorcode(Color::DarkGray, Color::White), 0xF8);
     }
 
 }

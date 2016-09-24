@@ -54,11 +54,11 @@ impl Vga {
 
     fn scroll(&mut self) {
         for row in 1..ROWS {
-           for col in 0..COLS {
-              let prev_position = (row - 1) * COLS * 2 + col;
-              let current_position = row * COLS * 2 + col;
-              self.buffer[prev_position] = self.buffer[current_position];
-           }
+            for col in 0..COLS {
+                let prev_position = (row - 1) * COLS * 2 + col;
+                let current_position = row * COLS * 2 + col;
+                self.buffer[prev_position] = self.buffer[current_position];
+            }
         }
         self.position = (ROWS - 1) * COLS * 2;
     }
@@ -91,7 +91,7 @@ mod tests {
         vga.write_str("a").unwrap();
 
         assert_eq!(vga.buffer[0], 'a' as u8);
-        assert_eq!(vga.buffer[1],  0x02);
+        assert_eq!(vga.buffer[1], 0x02);
     }
 
     #[test]
@@ -101,7 +101,7 @@ mod tests {
 
         let word = "word";
         vga.write_str(word).unwrap();
-      
+
         assert_eq!(vga.buffer[0], 'w' as u8);
         assert_eq!(vga.buffer[1], 0x02);
         assert_eq!(vga.buffer[2], 'o' as u8);
@@ -119,7 +119,7 @@ mod tests {
 
         vga.write_str("hello ").unwrap();
         vga.write_str("world").unwrap();
-      
+
         assert_eq!(vga.buffer[0], 'h' as u8);
         assert_eq!(vga.buffer[1], 0x02);
         assert_eq!(vga.buffer[2], 'e' as u8);
