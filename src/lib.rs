@@ -70,7 +70,7 @@ mod tests {
 
     #[test]
     fn write_a_letter() {
-        let mut mock_memory = [0u8; ROWS * COLS];
+        let mut mock_memory = [0u8; ROWS * COLS * 2];
 
         let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
 
@@ -82,7 +82,7 @@ mod tests {
 
     #[test]
     fn write_a_word() {
-        let mut mock_memory = [0u8; ROWS * COLS];
+        let mut mock_memory = [0u8; ROWS * COLS * 2];
         let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
 
         let word = "word";
@@ -100,7 +100,7 @@ mod tests {
 
     #[test]
     fn write_multiple_words() {
-        let mut mock_memory = [0u8; ROWS * COLS];
+        let mut mock_memory = [0u8; ROWS * COLS * 2];
         let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
 
         vga.write_str("hello ").unwrap();
@@ -132,7 +132,7 @@ mod tests {
 
     #[test]
     fn write_newline() {
-        let mut mock_memory = [0u8; ROWS * COLS];
+        let mut mock_memory = [0u8; ROWS * COLS * 2];
         let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
 
         vga.write_str("hello\nworld\n!").unwrap();
