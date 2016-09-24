@@ -30,17 +30,21 @@ impl Vga {
             core::ptr::copy_nonoverlapping(buffer, location, length);
         }
     }
+
+    fn write_byte(&mut self, byte: u8) {
+        let i = self.position;
+
+        self.buffer[i] = byte;
+        self.buffer[i + 1] = color::colorcode(Color::Green, Color::Black);
+
+        self.position += 2;
+    }
 }
 
 impl Write for Vga {
     fn write_str(&mut self, s: &str) -> Result<(), fmt::Error> {
         for b in s.bytes() {
-            let i = self.position;
-
-            self.buffer[i] = b;
-            self.buffer[i + 1] = color::colorcode(Color::Green, Color::Black);
-
-            self.position += 2;
+            self.write_byte(b);
         }
 
         Ok(())
