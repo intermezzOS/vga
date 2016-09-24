@@ -6,9 +6,12 @@ use core::fmt::Write;
 mod color;
 use color::Color;
 
+const ROWS: usize = 25;
+const COLS: usize = 80;
+
 pub struct Vga {
     location: *mut u8,
-    buffer: [u8; 25 * 80 * 2],
+    buffer: [u8; ROWS * COLS * 2],
     position: usize,
 }
 
@@ -16,7 +19,7 @@ impl Vga {
     pub unsafe fn new(location: *mut u8) -> Vga {
         Vga {
             location: location,
-            buffer: [0; 25 * 80 * 2],
+            buffer: [0; ROWS * COLS * 2],
             position: 0,
         }
     }
@@ -35,9 +38,9 @@ impl Vga {
         let i = self.position;
 
         if byte == '\n' as u8 {
-            let current_line = self.position / 50;
+            let current_line = self.position / (ROWS * 2);
 
-            self.position = (current_line + 1) * 25 * 2;
+            self.position = (current_line + 1) * ROWS * 2;
         } else {
             self.buffer[i] = byte;
             self.buffer[i + 1] = color::colorcode(Color::Green, Color::Black);
@@ -62,9 +65,12 @@ mod tests {
     use Vga;
     use core::fmt::Write;
 
+    use ROWS;
+    use COLS;
+
     #[test]
     fn write_a_letter() {
-        let mut mock_memory = [0u8; 25 * 80];
+        let mut mock_memory = [0u8; ROWS * COLS];
 
         let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
 
@@ -76,7 +82,7 @@ mod tests {
 
     #[test]
     fn write_a_word() {
-        let mut mock_memory = [0u8; 25 * 80];
+        let mut mock_memory = [0u8; ROWS * COLS];
         let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
 
         let word = "word";
@@ -94,7 +100,7 @@ mod tests {
 
     #[test]
     fn write_multiple_words() {
-        let mut mock_memory = [0u8; 25 * 80];
+        let mut mock_memory = [0u8; ROWS * COLS];
         let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
 
         vga.write_str("hello ").unwrap();
@@ -126,7 +132,7 @@ mod tests {
 
     #[test]
     fn write_newline() {
-        let mut mock_memory = [0u8; 25 * 80];
+        let mut mock_memory = [0u8; ROWS * COLS];
         let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
 
         vga.write_str("hello\nworld\n!").unwrap();
