@@ -3,6 +3,9 @@
 use core::fmt;
 use core::fmt::Write;
 
+mod color;
+use color::Color;
+
 pub struct Vga {
     location: *mut u8,
     buffer: [u8; 25 * 80 * 2],
@@ -35,7 +38,7 @@ impl Write for Vga {
             let i = self.position;
 
             self.buffer[i] = b;
-            self.buffer[i + 1] = 0x02;
+            self.buffer[i + 1] = color::colorcode(Color::Green, Color::Black);
 
             self.position += 2;
         }
