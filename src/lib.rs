@@ -8,10 +8,11 @@ use color::Color;
 
 const ROWS: usize = 25;
 const COLS: usize = 80;
+const COL_BYTES: usize = COLS * 2;
 
 pub struct Vga {
     location: *mut u8,
-    buffer: [u8; ROWS * COLS * 2],
+    buffer: [u8; ROWS * COL_BYTES],
     position: usize,
 }
 
@@ -19,7 +20,7 @@ impl Vga {
     pub unsafe fn new(location: *mut u8) -> Vga {
         Vga {
             location: location,
-            buffer: [0; ROWS * COLS * 2],
+            buffer: [0; ROWS * COL_BYTES],
             position: 0,
         }
     }
@@ -38,8 +39,8 @@ impl Vga {
         let i = self.position;
 
         if byte == '\n' as u8 {
-            let current_line = self.position / (COLS * 2);
-            self.position = (current_line + 1) * COLS * 2;
+            let current_line = self.position / (COL_BYTES);
+            self.position = (current_line + 1) * COL_BYTES;
         } else {
             self.buffer[i] = byte;
             self.buffer[i + 1] = color::colorcode(Color::Green, Color::Black);
@@ -54,18 +55,18 @@ impl Vga {
 
     fn scroll(&mut self) {
         for row in 1..ROWS {
-            for col in 0..COLS {
-                let prev_position = (row - 1) * COLS * 2 + col;
-                let current_position = row * COLS * 2 + col;
+            for cb in 0..COL_BYTES {
+                let prev_position = ((row - 1) * COL_BYTES) + cb;
+                let current_position = (row * COL_BYTES) + cb;
                 self.buffer[prev_position] = self.buffer[current_position];
             }
         }
          
-        for c in 0..COLS {
-            self.buffer[(ROWS - 1) * COLS * 2 + c] = ' ' as u8;
+        for cb in 0..COL_BYTES/2 {
+            self.buffer[((ROWS - 1) * COL_BYTES) + (cb * 2)] = ' ' as u8;
         }
 
-        self.position = (ROWS - 1) * COLS * 2;
+        self.position = (ROWS - 1) * COL_BYTES;
     }
 }
 
@@ -85,11 +86,11 @@ mod tests {
     use core::fmt::Write;
 
     use ROWS;
-    use COLS;
+    use COL_BYTES;
 
     #[test]
     fn write_a_letter() {
-        let mut mock_memory = [0u8; ROWS * COLS * 2];
+        let mut mock_memory = [0u8; ROWS * COL_BYTES];
 
         let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
 
@@ -101,7 +102,7 @@ mod tests {
 
     #[test]
     fn write_a_word() {
-        let mut mock_memory = [0u8; ROWS * COLS * 2];
+        let mut mock_memory = [0u8; ROWS * COL_BYTES];
         let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
 
         let word = "word";
@@ -119,7 +120,7 @@ mod tests {
 
     #[test]
     fn write_multiple_words() {
-        let mut mock_memory = [0u8; ROWS * COLS * 2];
+        let mut mock_memory = [0u8; ROWS * COL_BYTES];
         let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
 
         vga.write_str("hello ").unwrap();
@@ -151,7 +152,7 @@ mod tests {
 
     #[test]
     fn write_newline() {
-        let mut mock_memory = [0u8; ROWS * COLS * 2];
+        let mut mock_memory = [0u8; ROWS * COL_BYTES];
         let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
 
         vga.write_str("hello\nworld\n!").unwrap();
@@ -182,7 +183,7 @@ mod tests {
 
     #[test]
     fn write_scroll() {
-        let mut mock_memory = [0u8; ROWS * COLS * 2];
+        let mut mock_memory = [0u8; ROWS * COL_BYTES];
         let mut vga = unsafe { Vga::new(mock_memory.as_mut_ptr()) };
 
         for b in "abcdefghijklmnopqrstuvwxyz".bytes() {
@@ -191,8 +192,8 @@ mod tests {
         }
 
         assert_eq!(vga.buffer[0], 'c' as u8);
-        for c in 0..COLS {
-            assert_eq!(vga.buffer[(ROWS - 1) * COLS * 2 + c], ' ' as u8);
+        for cb in 0..COL_BYTES/2 {
+            assert_eq!(vga.buffer[(ROWS - 1) * COL_BYTES + (cb * 2)], ' ' as u8);
         }
     }
 
