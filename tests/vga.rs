@@ -5,6 +5,7 @@ use core::fmt::Write;
 use vga::Vga;
 
 #[test]
+#[ignore]
 fn create() {
     let mut mock_memory = vec![0u8; 25 * 80 * 2];
 
@@ -14,6 +15,7 @@ fn create() {
 fn check_write<T: Write>(_: T) { }
 
 #[test]
+#[ignore]
 fn write() {
     let mut mock_memory = vec![0u8; 25 * 80 * 2];
     let vga = Vga::new(&mut mock_memory);
@@ -21,6 +23,7 @@ fn write() {
 }
 
 #[test]
+#[ignore]
 fn flush() {
     let mut mock_memory = vec![0u8; 25 * 80 * 2];
 
